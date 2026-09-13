@@ -1,0 +1,16 @@
+{
+  "name": "華德福一上數學家學本",
+  "short_name": "華德福數學",
+  "description": "對照翰林版國小數學一上九個單元，用華德福的方式在家陪孩子學數學。",
+  "lang": "zh-Hant-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F5EF",
+  "theme_color": "#A4485C",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

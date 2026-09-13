@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <title>OG image 1200×630</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@700&family=Noto+Sans+TC:wght@500;700&display=block">
+  <style>
+    html,
+    body {
+      width: 1200px;
+      height: 630px;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    body {
+      position: relative;
+      background: #F4F5EF;
+      color: #25304A;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    .copy {
+      position: absolute;
+      top: 78px;
+      left: 80px;
+      width: 500px;
+    }
+
+    .label {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: #5D6475;
+    }
+
+    h1 {
+      margin: 22px 0 22px;
+      font-family: "LXGW WenKai TC", "DFKai-SB", serif;
+      font-size: 66px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    h1 span {
+      display: block;
+      color: #A4485C;
+    }
+
+    .sub {
+      margin: 0;
+      color: #5D6475;
+      font-size: 30px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .chips {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .chips span {
+      padding: 4px 18px;
+      border: 2px solid #DCDFD3;
+      border-radius: 999px;
+      background: #FBFBF7;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .painting {
+      position: absolute;
+      top: 60px;
+      right: 60px;
+      width: 590px;
+      height: 510px;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #FBF6EA;
+    }
+
+    .painting svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .painting svg g > * { mix-blend-mode: multiply; }
+    .painting svg .nb { mix-blend-mode: normal; }
+    .painting .grain { mix-blend-mode: multiply; opacity: .4; }
+  </style>
+</head>
+<body>
+  <div class="copy">
+    <div class="label">翰林版 · 國小數學一上</div>
+    <h1>華德福<span>一上數學家學本</span></h1>
+    <p class="sub">用故事、身體和雙手，<br>陪孩子學體制內的數學</p>
+    <div class="chips"><span>九個單元</span><span>說故事</span><span>在家活動</span></div>
+  </div>
+  <div class="painting" id="painting"></div>
+
+  <script src="../site/art.js"></script>
+  <script>
+    document.getElementById('painting').innerHTML = window.SCENES.hero();
+  </script>
+</body>
+</html>
