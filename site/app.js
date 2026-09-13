@@ -109,6 +109,17 @@ function tableHTML(table) {
   </table></div></section>`;
 }
 
+function verseHTML(verse) {
+  return `<section class="sec col">
+    <div class="sec-head"><h2>唸唱歌謠</h2><span class="count">邊唸邊做動作</span></div>
+    <div class="chant">
+      <p class="chant-title">${verse.title}</p>
+      ${verse.lines.map(([line, move]) => `<div class="chant-line"><span class="chant-text">${line}</span><span class="chant-move">${move}</span></div>`).join('')}
+    </div>
+    ${verse.note ? `<p class="sec-note">${verse.note}</p>` : ''}
+  </section>`;
+}
+
 function unitPage(u) {
   const units = u.ed.units, i = u.idx, prev = units[i - 1], next = units[i + 1];
   const table = unitTable(u);
@@ -118,8 +129,10 @@ function unitPage(u) {
     <header class="uhead"><span class="no">${mark(u)}</span><h1>${u.title}</h1><div class="chips">${u.secs.map((x) => `<span>${x}</span>`).join('')}</div></header>
     <p class="image-line col">核心意象：${u.image}</p>
 
+    ${u.verse ? verseHTML(u.verse) : ''}
+
     <section class="sec col">
-      <div class="sec-head"><h2>今天的故事</h2><button class="btn primary" type="button" data-story="${u.id}">開始說故事</button></div>
+      <div class="sec-head"><h2>今天的故事</h2><button class="btn primary" type="button" data-story="${u.id}">${u.verse ? '唸歌謠、說故事' : '開始說故事'}</button></div>
       ${u.storyNote ? `<p class="sec-note">${u.storyNote}</p>` : ''}
       <div class="story">
         ${u.story.map((t) => `<p>${t}</p>`).join('')}
@@ -178,7 +191,7 @@ function prepPage() {
     <section class="sec col">
       <h2>國語的每日節奏（約 20 分鐘）</h2>
       <ol class="rhythm">
-        <li><span class="min">3 分</span><span><strong>律動：</strong>拍手唸兒歌，或跟著節奏唸學過的課文</span></li>
+        <li><span class="min">3 分</span><span><strong>律動：</strong>拍手唸這一課的歌謠，邊唸邊做動作</span></li>
         <li><span class="min">3 分</span><span><strong>回顧：</strong>請孩子把昨天的故事說給你聽</span></li>
         <li><span class="min">7 分</span><span><strong>新內容：</strong>講符號或生字的故事，用身體扮出它的樣子</span></li>
         <li><span class="min">5 分</span><span><strong>畫與寫：</strong>先畫圖，再從圖裡寫出符號或字</span></li>
@@ -317,11 +330,21 @@ function closeStory() {
   if (smReturn) smReturn.focus();
 }
 
+// 說故事模式的頁面：有歌謠的單元先唸歌謠，再講故事，最後是提問。
+function storySlides(u) {
+  return [
+    ...(u.verse ? [{ type: 'verse' }] : []),
+    ...u.story.map((text) => ({ type: 'story', text })),
+    { type: 'ask' }
+  ];
+}
+
 function drawStory() {
-  const u = smUnit, total = u.story.length + 1, last = smIdx === total - 1;
-  const body = last
-    ? `<div class="sm-ask"><span class="label">講完可以問孩子</span><p class="sm-text">${u.ask}</p></div>`
-    : `<p class="sm-text">${u.story[smIdx]}</p>`;
+  const u = smUnit, slides = storySlides(u), total = slides.length, last = smIdx === total - 1, slide = slides[smIdx];
+  let body;
+  if (slide.type === 'verse') body = `<div class="sm-ask"><span class="label">先一起唸：${u.verse.title}</span><p class="sm-text sm-verse">${u.verse.lines.map(([line]) => line).join('<br>')}</p></div>`;
+  else if (slide.type === 'ask') body = `<div class="sm-ask"><span class="label">講完可以問孩子</span><p class="sm-text">${u.ask}</p></div>`;
+  else body = `<p class="sm-text">${slide.text}</p>`;
   sm.innerHTML = `<div class="sm-top"><span class="label">${bookName(u.ed)} · ${unitLabel(u)} · ${u.title} · 說故事</span><button class="btn" type="button" data-s="close">結束</button></div>
     <div class="sm-body" data-s="next">${art(artKey(u))}${body}</div>
     <div class="sm-bottom">
@@ -334,7 +357,7 @@ function drawStory() {
 }
 
 function step(delta) {
-  const total = smUnit.story.length + 1, nextIdx = smIdx + delta;
+  const total = storySlides(smUnit).length, nextIdx = smIdx + delta;
   if (nextIdx < 0 || nextIdx >= total) return;
   smIdx = nextIdx;
   drawStory();
