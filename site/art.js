@@ -146,6 +146,78 @@
     }
   };
 
+  /* ---------- 國語插畫 ---------- */
+  const t = (x, y, str, col, size, o = .85) => `<text x="${x}" y="${y}" font-size="${size}" font-family="'LXGW WenKai TC','BiauKai','DFKai-SB',serif" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="${col}" fill-opacity="${o}">${str}</text>`;
+  const ring = (x, y, rad, col, w = 4, o = .8) => `<circle cx="${x}" cy="${y}" r="${rad}" fill="${col}" fill-opacity=".12" stroke="${col}" stroke-width="${w}" stroke-opacity="${o}"/>`;
+  const hand = (x, y, k, col, rot) => `<g transform="rotate(${rot} ${x} ${y})">${e(x, y, 32 * k, 38 * k, col, .8)}${e(x - 40 * k, y + 4 * k, 9 * k, 21 * k, col, .8, -40)}${e(x - 22 * k, y - 52 * k, 8 * k, 24 * k, col, .8, -8)}${e(x - 6 * k, y - 60 * k, 8 * k, 26 * k, col, .8)}${e(x + 10 * k, y - 57 * k, 8 * k, 25 * k, col, .8, 6)}${e(x + 25 * k, y - 46 * k, 7 * k, 20 * k, col, .8, 14)}</g>`;
+  const lantern = (x, y, k) => s(`M${x} ${y - 90 * k} L ${x} ${y - 62 * k}`, C.brown, 3) + r(x - 18 * k, y - 66 * k, 36 * k, 10 * k, C.gold, .95) + e(x, y, 48 * k, 58 * k, C.carmine, .9) + r(x - 18 * k, y + 54 * k, 36 * k, 10 * k, C.gold, .95) + s(`M${x} ${y + 64 * k} L ${x} ${y + 100 * k}`, C.gold, 4);
+
+  Object.assign(SCENES, {
+    zy: () => frame(
+      r(-40, -40, 880, 520, C.lemon, .35) + e(620, 120, 220, 120, C.rose, .25) + hill(330, 30, C.leaf, .35),
+      hill(385, 20, C.leaf, .6) + s('M640 410 Q 632 300 644 215', C.brown, 20) + s('M643 222 Q 606 160 574 118', C.brown, 11) + s('M643 222 Q 680 160 712 112', C.brown, 11)
+      + e(712, 100, 18, 13, C.verm) + c(726, 90, 8, C.verm) + p('M733 89 l 10 3 l -10 3 Z', C.gold, .95)
+      + `<g transform="rotate(16 300 400)">${gnome(300, 400, 1, C.carmine, C.ultra)}</g>` + c(356, 330, 20, C.carmine, .9) + s('M356 310 q 4 -10 12 -12', C.brown, 3)
+      + t(120, 170, 'ㄅ', C.carmine, 120) + t(470, 150, 'ㄚ', C.prus, 110) + t(530, 330, 'ㄇ', C.violet, 96),
+      '彎腰抱著蘋果的小矮人、分叉的樹枝，和注音符號ㄅ、ㄚ、ㄇ'),
+    magic: () => frame(
+      r(-40, -40, 880, 300, C.sky, .35) + e(150, 90, 170, 110, C.gold, .4) + e(690, 80, 160, 100, C.violet, .25),
+      c(150, 95, 42, C.gold, .9) + p('M690 54 A 32 32 0 0 0 690 118 A 40 40 0 0 1 690 54 Z', C.gold, .95)
+      + p('M20 385 L 190 150 L 285 285 L 380 110 L 480 285 L 565 175 L 740 385 Z', C.prus, .7)
+      + hill(350, 15, C.leaf, .72) + tree(650, 410, .75, [C.moss, C.leaf, C.moss])
+      + p('M-20 470 Q 200 380 380 402 Q 560 424 820 364 L 820 470 Z', C.ultra, .62) + s('M120 440 q 40 -12 80 0 t 80 0', C.sky, 4, .6) + s('M460 432 q 40 -12 80 0 t 80 0', C.sky, 4, .6),
+      '太陽、月亮、山、樹和河：日月山木水'),
+    boat: () => frame(
+      r(-40, -40, 880, 320, C.sky, .35) + e(620, 90, 200, 90, C.lemon, .4) + hill(260, 30, C.leaf, .35),
+      r(-20, 290, 840, 180, C.ultra, .55) + s('M60 350 q 40 -12 80 0 t 80 0', C.sky, 4, .6) + s('M520 420 q 40 -12 80 0 t 80 0 t 80 0', C.sky, 4, .6)
+      + s('M40 300 L 30 220', C.moss, 5) + s('M60 300 L 66 210', C.moss, 5) + s('M84 300 L 78 236', C.moss, 5)
+      + s('M430 322 L 430 150', C.brown, 8) + p('M438 160 L 438 300 L 550 300 Z', C.carmine, .85)
+      + gnome(330, 322, .62, C.verm, C.leaf) + s('M345 290 L 250 372', C.brown, 6)
+      + p('M250 318 L 580 318 Q 550 380 420 384 Q 300 380 250 318 Z', C.brown, .9),
+      '小矮人坐著小船在河上划'),
+    hands: () => frame(
+      r(-40, -40, 880, 520, '#F3DFA8', .35) + e(400, 230, 380, 170, C.rose, .22),
+      hand(170, 220, 1.1, C.carmine, -18) + hand(330, 310, .9, C.ultra, 10) + hand(480, 190, 1.2, C.gold, -4) + hand(630, 310, 1, C.leaf, 16) + hand(720, 160, .8, C.violet, -12),
+      '五顏六色的手印'),
+    bubbles: () => frame(
+      r(-40, -40, 880, 520, C.sky, .3) + e(600, 120, 260, 140, C.lemon, .35) + hill(330, 25, C.leaf, .35),
+      hill(390, 18, C.leaf, .62) + gnome(170, 400, 1, C.verm, C.gold) + s('M186 280 L 244 250', C.brown, 4) + ring(258, 242, 12, C.ultra, 3)
+      + ring(360, 200, 44, C.ultra) + ring(470, 130, 70, C.violet) + ring(420, 300, 26, C.carmine) + ring(600, 220, 52, C.prus) + ring(700, 110, 30, C.carmine) + ring(560, 340, 18, C.gold),
+      '小矮人吹出大大小小的泡泡'),
+    hello: () => frame(
+      r(-40, -40, 880, 520, C.lemon, .35) + e(400, 110, 240, 110, C.gold, .35) + hill(320, 30, C.leaf, .35),
+      c(400, 105, 44, C.gold, .9) + hill(390, 18, C.leaf, .62)
+      + gnome(280, 400, 1, C.carmine, C.ultra) + s('M306 330 Q 340 300 350 250', C.ultra, 12) + c(352, 244, 9, C.skin, .95)
+      + gnome(540, 400, .85, C.prus, C.verm) + s('M518 340 Q 488 310 480 268', C.verm, 11) + c(478, 262, 8, C.skin, .95)
+      + s('M372 236 q 8 -10 0 -20', C.gold, 3, .8) + s('M456 250 q -8 -10 0 -20', C.gold, 3, .8),
+      '兩個小矮人揮手說你好'),
+    alien: () => frame(
+      r(-40, -40, 880, 520, C.ultra, .5) + e(560, 140, 260, 140, C.violet, .45) + hill(330, 30, C.prus, .45),
+      c(100, 60, 4, C.lemon, .95, 'nb') + c(220, 120, 3, C.lemon, .95, 'nb') + c(320, 50, 4, C.lemon, .95, 'nb') + c(760, 60, 3, C.lemon, .95, 'nb') + c(700, 240, 3, C.lemon, .95, 'nb')
+      + p('M470 180 L 380 390 L 660 390 L 570 180 Z', C.lemon, .35) + e(520, 170, 120, 34, C.grey, .92) + e(520, 145, 52, 40, C.sky, .9)
+      + c(450, 178, 6, C.gold, .95, 'nb') + c(520, 186, 6, C.gold, .95, 'nb') + c(590, 178, 6, C.gold, .95, 'nb')
+      + hill(395, 16, C.moss, .7) + e(520, 360, 16, 22, C.leaf, .95) + c(520, 326, 15, C.leaf, .95) + s('M512 314 l -8 -16', C.leaf, 3) + s('M528 314 l 8 -16', C.leaf, 3)
+      + c(504, 296, 4, C.gold, .95, 'nb') + c(536, 296, 4, C.gold, .95, 'nb')
+      + r(120, 300, 110, 80, C.ochre, .9) + p('M104 305 L 175 250 L 246 305 Z', C.carmine, .9) + r(160, 322, 26, 26, C.gold, 1, 0, 'nb'),
+      '夜空中的飛船和小外星人'),
+    goldfish: () => frame(
+      r(-40, -40, 880, 520, '#F1E3B8', .35) + e(400, 260, 330, 190, C.sky, .3),
+      r(-20, 400, 840, 70, C.ochre, .5) + p('M260 150 Q 230 260 270 360 Q 400 420 530 360 Q 570 260 540 150 Z', C.sky, .45)
+      + p('M250 190 Q 400 170 550 190 Q 575 280 530 360 Q 400 420 270 360 Q 228 280 250 190 Z', C.ultra, .3)
+      + s('M320 370 Q 300 320 320 270', C.moss, 6) + s('M340 372 Q 360 320 344 280', C.leaf, 5) + s('M480 368 Q 470 330 490 300', C.moss, 6)
+      + p('M330 250 L 300 225 L 305 275 Z', C.verm, .88) + e(375, 250, 48, 28, C.verm, .9) + c(402, 244, 4, C.prus, .95, 'nb')
+      + p('M500 300 L 522 284 L 520 316 Z', C.gold, .88) + e(470, 300, 28, 16, C.gold, .9) + c(455, 296, 3, C.prus, .95, 'nb')
+      + ring(420, 205, 8, C.sky, 2) + ring(432, 180, 6, C.sky, 2) + ring(418, 160, 5, C.sky, 2),
+      '魚缸裡的兩條小金魚吐泡泡'),
+    spring: () => frame(
+      r(-40, -40, 880, 520, C.lemon, .35) + e(400, 240, 360, 180, C.rose, .3),
+      lantern(130, 190, 1) + lantern(670, 190, 1)
+      + p('M400 70 L 560 230 L 400 390 L 240 230 Z', C.carmine, .9) + t(400, 232, '春', '#2B2530', 150, .9)
+      + s('M-10 430 Q 120 380 240 400', C.brown, 8) + s('M140 400 q 10 -30 30 -40', C.brown, 5)
+      + c(60, 404, 10, C.rose, .9) + c(110, 392, 9, C.rose, .9) + c(170, 360, 9, C.rose, .9) + c(210, 398, 8, C.rose, .9) + c(150, 408, 7, C.carmine, .8),
+      '紅紙上的春字、紅燈籠和梅花')
+  });
+
   window.SCENES = SCENES;
   window.art = (key) => `<div class="art">${SCENES[key]()}</div>`;
 })();

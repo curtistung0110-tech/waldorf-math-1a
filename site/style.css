@@ -81,6 +81,9 @@ button { font: inherit; color: inherit; }
 .notice strong { color: var(--gold); }
 
 .edition-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 15px; color: var(--muted); }
+.book-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.book-group { display: inline-flex; align-items: center; gap: 8px; }
+.book-subject { font-family: var(--kai); font-size: 17px; font-weight: 700; color: var(--ink); }
 .edition-switch { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
 .edition-switch button { border: 0; background: transparent; padding: 5px 16px; border-radius: 999px; font-size: 15px; font-weight: 500; color: var(--muted); cursor: pointer; }
 .edition-switch button:hover { color: var(--ink); }
