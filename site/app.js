@@ -1,7 +1,12 @@
-const UNITS = window.UNITS;
+const EDITIONS = window.EDITIONS;
 const art = window.art;
 const NUM = ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
 const STAGES = { 經驗: 's1', 回想: 's2', 符號: 's3', 延伸: 's4', 課本: 's4' };
+
+EDITIONS.forEach((ed) => ed.units.forEach((u, i) => { u.ed = ed; u.idx = i; }));
+const ALL_UNITS = EDITIONS.flatMap((ed) => ed.units);
+const findUnit = (id) => ALL_UNITS.find((u) => u.id === id);
+const artKey = (u) => u.art || u.id;
 
 /* ---------- 儲存（只存在這台裝置的瀏覽器） ---------- */
 const store = {
@@ -12,23 +17,35 @@ const done = store.get('wm1a-done', {});
 const doneCount = (u) => u.acts.filter((_, i) => done[u.id] && done[u.id][i]).length;
 const dotClass = (u) => { const n = doneCount(u); return 'dot' + (n === 0 ? '' : n === u.acts.length ? ' all' : ' some'); };
 
+let edition = EDITIONS.find((ed) => ed.id === store.get('wm1a-edition', '')) || EDITIONS[0];
+function setEdition(ed) {
+  edition = ed;
+  store.set('wm1a-edition', ed.id);
+}
+
 /* ---------- 頁面 ---------- */
+function editionSwitch() {
+  return `<div class="edition-switch" role="group" aria-label="課本版本">${EDITIONS.map((ed) => `<button type="button" data-edition="${ed.id}" aria-pressed="${ed === edition}">${ed.name}</button>`).join('')}</div>`;
+}
+
 function progressHTML(u) {
   const n = doneCount(u), t = u.acts.length;
   return `<div class="progress"><div class="bar"><i style="width:${n / t * 100}%"></i></div><span>活動 ${n} / ${t}</span></div>`;
 }
 
 function home() {
-  const last = UNITS.find((u) => u.id === store.get('wm1a-last', ''));
+  const last = findUnit(store.get('wm1a-last', ''));
+  const first = edition.units[0];
   const actions = last
-    ? `<a class="btn primary" href="#/${last.id}">繼續：單元${NUM[UNITS.indexOf(last)]} ${last.title}</a><a class="btn" href="#/prep">開始之前</a>`
-    : `<a class="btn primary" href="#/prep">從「開始之前」讀起</a><a class="btn" href="#/u1">直接看單元一</a>`;
+    ? `<a class="btn primary" href="#/${last.id}">繼續：${last.ed.name}單元${NUM[last.idx]} ${last.title}</a><a class="btn" href="#/prep">開始之前</a>`
+    : `<a class="btn primary" href="#/prep">從「開始之前」讀起</a><a class="btn" href="#/${first.id}">直接看單元一</a>`;
   return `
-  <section class="hero">
+  <section class="hero" id="top">
     <div class="hero-text">
-      <span class="label">翰林版 · 國小數學一年級上學期</span>
+      <span class="label">國小數學一年級上學期 · 翰林版、南一版</span>
       <h1>華德福一上數學家學本</h1>
-      <p class="lede">學校教符號和算法，家裡補上故事、身體和雙手的經驗。九個單元，每個都有可以唸給孩子聽的故事、一週怎麼排、在家活動，以及怎麼接回課本。</p>
+      <p class="lede">學校教符號和算法，家裡補上故事、身體和雙手的經驗。依照孩子的課本版本排好九個單元，每個都有可以唸給孩子聽的故事、一週怎麼排、在家活動，以及怎麼接回課本。</p>
+      <div class="edition-row"><span>孩子的課本是</span>${editionSwitch()}</div>
       <div class="actions">${actions}</div>
     </div>
     ${art('hero')}
@@ -41,16 +58,17 @@ function home() {
   <section class="home-section">
     <h2>怎麼用這個網站</h2>
     <ol class="steps">
-      <li><b>找到這週的單元</b>對照學校進度表，打開對應的單元頁。</li>
+      <li><b>選版本、找單元</b>選好孩子的課本版本，對照學校進度表，打開這週的單元。</li>
       <li><b>前一晚先讀故事</b>自己先唸一遍，想好要用哪些寶物。</li>
       <li><b>當天按「說故事」</b>大字一段一段翻，講完照一週安排做活動，做完打勾。</li>
     </ol>
   </section>
 
   <section class="home-section" id="units">
-    <h2>九個單元</h2>
+    <div class="sec-head"><h2>九個單元 · ${edition.name}</h2>${editionSwitch()}</div>
+    ${edition.note ? `<p class="sec-note col">${edition.note}</p>` : ''}
     <div class="unit-grid">
-      ${UNITS.map((u, i) => `<a class="ucard" href="#/${u.id}">${art(u.id)}<div class="ucard-body"><div class="ucard-title"><b>${NUM[i]}</b><span>${u.title}</span></div><div class="ucard-secs">${u.secs.join('　')}</div>${progressHTML(u)}</div></a>`).join('')}
+      ${edition.units.map((u, i) => `<a class="ucard" href="#/${u.id}">${art(artKey(u))}<div class="ucard-body"><div class="ucard-title"><b>${NUM[i]}</b><span>${u.title}</span></div><div class="ucard-secs">${u.secs.join('　')}</div>${progressHTML(u)}</div></a>`).join('')}
     </div>
   </section>
 
@@ -62,11 +80,11 @@ function home() {
   </section>`;
 }
 
-function side(active) {
+function side(active, ed) {
   const cur = (id) => (active === id ? ' aria-current="page"' : '');
-  return `<aside class="side" aria-label="單元目錄"><span class="label">目錄</span>
+  return `<aside class="side" aria-label="單元目錄"><span class="label">目錄 · ${ed.name}</span>
     <ol><li><a class="plain" href="#/prep"${cur('prep')}>開始之前</a></li></ol>
-    <ol>${UNITS.map((u, i) => `<li><a href="#/${u.id}"${cur(u.id)}><b>${NUM[i]}</b><span>${u.title}</span><span class="${dotClass(u)}" aria-hidden="true"></span></a></li>`).join('')}</ol>
+    <ol>${ed.units.map((u, i) => `<li><a href="#/${u.id}"${cur(u.id)}><b>${NUM[i]}</b><span>${u.title}</span><span class="${dotClass(u)}" aria-hidden="true"></span></a></li>`).join('')}</ol>
     <ol><li><a class="plain" href="#/parents"${cur('parents')}>給爸媽的叮嚀</a></li></ol>
   </aside>`;
 }
@@ -79,10 +97,10 @@ function numbersTable(rows) {
 }
 
 function unitPage(u) {
-  const i = UNITS.indexOf(u), prev = UNITS[i - 1], next = UNITS[i + 1];
-  return `<div class="page">${side(u.id)}<article class="content">
-    <div class="crumb"><a href="#/">首頁</a> ／ 單元${NUM[i]}</div>
-    ${art(u.id)}
+  const units = u.ed.units, i = u.idx, prev = units[i - 1], next = units[i + 1];
+  return `<div class="page">${side(u.id, u.ed)}<article class="content">
+    <div class="crumb"><a href="#/">首頁</a> ／ ${u.ed.name} ／ 單元${NUM[i]}</div>
+    ${art(artKey(u))}
     <header class="uhead"><span class="no">${NUM[i]}</span><h1>${u.title}</h1><div class="chips">${u.secs.map((x) => `<span>${x}</span>`).join('')}</div></header>
     <p class="image-line col">核心意象：${u.image}</p>
 
@@ -125,7 +143,8 @@ function unitPage(u) {
 }
 
 function prepPage() {
-  return `<div class="page">${side('prep')}<article class="content">
+  const first = edition.units[0];
+  return `<div class="page">${side('prep', edition)}<article class="content">
     <div class="crumb"><a href="#/">首頁</a> ／ 開始之前</div>
     ${art('prep')}
     <header class="col"><h1 class="page-title">開始之前</h1></header>
@@ -168,12 +187,13 @@ function prepPage() {
       <div class="panel"><span class="label">主課本</span><p>一本無格線的大畫冊，搭配塊狀蜂蠟筆。每個故事畫一頁，一學期下來，就是孩子自己寫的數學書。</p></div>
     </div>
 
-    <nav class="pager col"><a class="next" href="#/u1"><span>下一頁</span><b>一　10 以內的數</b></a></nav>
+    <nav class="pager col"><a class="next" href="#/${first.id}"><span>下一頁 · ${edition.name}</span><b>一　${first.title}</b></a></nav>
   </article></div>`;
 }
 
 function parentsPage() {
-  return `<div class="page">${side('parents')}<article class="content">
+  const last = edition.units[edition.units.length - 1];
+  return `<div class="page">${side('parents', edition)}<article class="content">
     <div class="crumb"><a href="#/">首頁</a> ／ 給爸媽的叮嚀</div>
     ${art('parents')}
     <header class="col"><h1 class="page-title">給爸媽的叮嚀</h1></header>
@@ -184,8 +204,8 @@ function parentsPage() {
       <li><b>看孩子的精神</b>剛從華德福幼兒園進到體制內，第一學期光是坐著寫字就很累。累的時候，只做律動和說故事就好。</li>
       <li><b>跟著季節走</b>一上剛好是秋天到冬天，栗子、橡實、落葉、準備過冬，都是現成的數學教材。</li>
     </ul>
-    <p class="source col">單元與小節名稱參考均一教育平台「類翰林版」一年級數學。翰林每年可能微調，請以孩子手上的課本目錄為準。</p>
-    <nav class="pager col"><a href="#/u9"><span>上一單元</span><b>九　時間</b></a></nav>
+    <p class="source col">單元與小節名稱參考均一教育平台「類翰林版」「類南一版」一年級數學。出版社每年可能微調，請以孩子手上的課本目錄為準。</p>
+    <nav class="pager col"><a href="#/${last.id}"><span>上一單元 · ${edition.name}</span><b>九　${last.title}</b></a></nav>
   </article></div>`;
 }
 
@@ -198,9 +218,16 @@ function render() {
   if (route === 'prep') { app.innerHTML = prepPage(); nav = 'prep'; }
   else if (route === 'parents') { app.innerHTML = parentsPage(); nav = 'parents'; }
   else {
-    const u = UNITS.find((x) => x.id === route);
-    if (u) { app.innerHTML = unitPage(u); store.set('wm1a-last', u.id); nav = 'units'; }
-    else { app.innerHTML = home(); nav = route === 'units' ? 'units' : 'home'; }
+    const u = findUnit(route);
+    if (u) {
+      setEdition(u.ed);
+      store.set('wm1a-last', u.id);
+      app.innerHTML = unitPage(u);
+      nav = 'units';
+    } else {
+      app.innerHTML = home();
+      nav = route === 'units' ? 'units' : 'home';
+    }
   }
   document.querySelectorAll('.topnav a').forEach((a) => {
     if (a.dataset.nav === nav) a.setAttribute('aria-current', 'page');
@@ -219,7 +246,7 @@ app.addEventListener('change', (ev) => {
   done[id] = done[id] || {};
   done[id][t.dataset.idx] = t.checked;
   store.set('wm1a-done', done);
-  const u = UNITS.find((x) => x.id === id);
+  const u = findUnit(id);
   const count = app.querySelector(`[data-count="${id}"]`);
   if (count) count.textContent = `已做 ${doneCount(u)} / ${u.acts.length}`;
   const dot = app.querySelector(`.side a[href="#/${id}"] .dot`);
@@ -227,6 +254,20 @@ app.addEventListener('change', (ev) => {
 });
 
 app.addEventListener('click', (ev) => {
+  const edBtn = ev.target.closest('[data-edition]');
+  if (edBtn) {
+    const ed = EDITIONS.find((x) => x.id === edBtn.dataset.edition);
+    if (!ed || ed === edition) return;
+    const section = edBtn.closest('section');
+    const sectionId = section ? section.id : '';
+    const y = window.scrollY;
+    setEdition(ed);
+    app.innerHTML = home();
+    window.scrollTo(0, y);
+    const again = sectionId && app.querySelector(`#${sectionId} [data-edition="${ed.id}"]`);
+    if (again) again.focus();
+    return;
+  }
   const btn = ev.target.closest('[data-story]');
   if (btn) openStory(btn.dataset.story, btn);
 });
@@ -236,7 +277,7 @@ const sm = document.getElementById('storymode');
 let smUnit = null, smIdx = 0, smReturn = null;
 
 function openStory(id, btn) {
-  smUnit = UNITS.find((u) => u.id === id);
+  smUnit = findUnit(id);
   smIdx = 0;
   smReturn = btn;
   sm.hidden = false;
@@ -251,12 +292,12 @@ function closeStory() {
 }
 
 function drawStory() {
-  const u = smUnit, total = u.story.length + 1, last = smIdx === total - 1, i = UNITS.indexOf(u);
+  const u = smUnit, total = u.story.length + 1, last = smIdx === total - 1;
   const body = last
     ? `<div class="sm-ask"><span class="label">講完可以問孩子</span><p class="sm-text">${u.ask}</p></div>`
     : `<p class="sm-text">${u.story[smIdx]}</p>`;
-  sm.innerHTML = `<div class="sm-top"><span class="label">單元${NUM[i]} · ${u.title} · 說故事</span><button class="btn" type="button" data-s="close">結束</button></div>
-    <div class="sm-body" data-s="next">${art(u.id)}${body}</div>
+  sm.innerHTML = `<div class="sm-top"><span class="label">${u.ed.name} · 單元${NUM[u.idx]} · ${u.title} · 說故事</span><button class="btn" type="button" data-s="close">結束</button></div>
+    <div class="sm-body" data-s="next">${art(artKey(u))}${body}</div>
     <div class="sm-bottom">
       <button class="btn" type="button" data-s="prev"${smIdx === 0 ? ' disabled' : ''}>← 上一段</button>
       <div><div class="sm-dots" aria-hidden="true">${Array.from({ length: total }, (_, k) => `<i class="${k === smIdx ? 'on' : ''}"></i>`).join('')}</div><p class="sm-hint">點畫面或按 → 翻頁</p></div>
