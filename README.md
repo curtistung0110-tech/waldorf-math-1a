@@ -59,10 +59,12 @@ npx http-server site -p 8080
 
 ## 部署
 
-推送到 `main` 分支時，GitHub Actions 會同時部署到：
+推送到 `main` 分支時會同時部署到：
 
-1. **GitHub Pages**：儲存庫 Settings → Pages 的來源需設為「GitHub Actions」。
-2. **Cloudflare Pages**：需要在儲存庫設定以下值，沒設定時會自動略過這一步。Pages 專案不存在時會自動建立。
+1. **GitHub Pages**：https://curtistung0110-tech.github.io/waldorf-math-1a/ ，由 GitHub Actions 部署；儲存庫 Settings → Pages 的來源需設為「GitHub Actions」。
+2. **Cloudflare Pages**：https://waldorf-math-1a.pages.dev/ ，由 Cloudflare Pages 的 Git 連線自動部署（Cloudflare 後台設定：Framework preset 選 None、不需要建置指令、Build output directory 填 `site`）。
+
+GitHub Actions 裡的 Cloudflare Pages 工作是備用的 API Token 部署方式，目前沒有設定 Token，所以會自動略過。若改用這個方式，需在儲存庫設定以下值，Pages 專案不存在時會自動建立：
 
 | 名稱 | 類型 | 說明 |
 |---|---|---|
